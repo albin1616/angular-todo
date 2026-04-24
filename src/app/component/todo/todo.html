@@ -1,4 +1,137 @@
-<p>todo works!</p>
-<div>
-    <h1>{{ name() }}</h1>
+<div class="max-w-2xl mx-auto p-6">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Todo App</h1>
+  
+  <!-- Add Todo Input -->
+  <div class="flex gap-2 mb-6">
+    <input
+      type="text"
+      [value]="newTodoText()"
+      (input)="newTodoText.set($any($event.target).value)"
+      (keyup.enter)="addTodo()"
+      placeholder="Add a new todo..."
+      class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+    <button
+      (click)="addTodo()"
+      class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+    >
+      Add
+    </button>
+  </div>
+
+  <!-- Filter Buttons -->
+  <div class="flex gap-2 mb-6">
+    <button
+      (click)="setFilter('all')"
+      [class.bg-blue-500]="filter() === 'all'"
+      [class.text-white]="filter() === 'all'"
+      [class.bg-gray-200]="filter() !== 'all'"
+      [class.text-gray-700]="filter() !== 'all'"
+      class="px-4 py-2 rounded-lg transition-colors"
+    >
+      All
+    </button>
+    <button
+      (click)="setFilter('active')"
+      [class.bg-blue-500]="filter() === 'active'"
+      [class.text-white]="filter() === 'active'"
+      [class.bg-gray-200]="filter() !== 'active'"
+      [class.text-gray-700]="filter() !== 'active'"
+      class="px-4 py-2 rounded-lg transition-colors"
+    >
+      Active
+    </button>
+    <button
+      (click)="setFilter('completed')"
+      [class.bg-blue-500]="filter() === 'completed'"
+      [class.text-white]="filter() === 'completed'"
+      [class.bg-gray-200]="filter() !== 'completed'"
+      [class.text-gray-700]="filter() !== 'completed'"
+      class="px-4 py-2 rounded-lg transition-colors"
+    >
+      Completed
+    </button>
+  </div>
+
+  <!-- Todo List -->
+  <div class="space-y-2">
+    @for (todo of filteredTodos(); track todo.id) {
+      <div
+        class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-sm border border-gray-200"
+      >
+        <!-- Checkbox -->
+        <input
+          type="checkbox"
+          [checked]="todo.completed"
+          (change)="toggleTodo(todo.id)"
+          class="w-5 h-5 rounded border-gray-300 text-blue-500 focus:ring-blue-500"
+        />
+
+        <!-- Todo Text (Display Mode) -->
+        @if (editingId() !== todo.id) {
+          <span
+            [class.line-through]="todo.completed"
+            [class.text-gray-500]="todo.completed"
+            class="flex-1 text-gray-800"
+          >
+            {{ todo.text }}
+          </span>
+        }
+
+        <!-- Edit Input (Edit Mode) -->
+        @if (editingId() === todo.id) {
+          <input
+            type="text"
+            [value]="editText()"
+            (input)="editText.set($any($event.target).value)"
+            (keyup.enter)="saveEdit(todo.id)"
+            (keyup.escape)="cancelEdit()"
+            class="flex-1 px-3 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        }
+
+        <!-- Edit Button -->
+        @if (editingId() !== todo.id) {
+          <button
+            (click)="startEdit(todo.id, todo.text)"
+            class="px-3 py-1 text-gray-600 hover:text-blue-500 transition-colors"
+          >
+            Edit
+          </button>
+        }
+
+        <!-- Save Button (Edit Mode) -->
+        @if (editingId() === todo.id) {
+          <button
+            (click)="saveEdit(todo.id)"
+            class="px-3 py-1 text-green-600 hover:text-green-700 transition-colors"
+          >
+            Save
+          </button>
+        }
+
+        <!-- Cancel Button (Edit Mode) -->
+        @if (editingId() === todo.id) {
+          <button
+            (click)="cancelEdit()"
+            class="px-3 py-1 text-gray-600 hover:text-gray-700 transition-colors"
+          >
+            Cancel
+          </button>
+        }
+
+        <!-- Delete Button -->
+        <button
+          (click)="deleteTodo(todo.id)"
+          class="px-3 py-1 text-red-600 hover:text-red-700 transition-colors"
+        >
+          Delete
+        </button>
+      </div>
+    } @empty {
+      <div class="text-center py-8 text-gray-500">
+        <p>No todos to display</p>
+      </div>
+    }
+  </div>
 </div>
